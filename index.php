@@ -82,7 +82,7 @@ if (isset($_POST['submit'])) {
         <div class="container-fluid">
             <form action="" method="post">
                 <?php
-                    include './header.php';
+                include './header.php';
                 ?>
                 <main class="mt-4">
                     <div class="container">
@@ -94,19 +94,7 @@ if (isset($_POST['submit'])) {
                                 <tr class="text-center">
                                     <th>Id</th>
                                     <th>EAN</th>
-                                    <th>Item</th>
-                                    <th>Brand</th>
-                                    <th class="text-left">Model</th>
-                                    <th>Year</th>
-                                    <th>Qty</th>
-                                    <th>Price</th>
-                                    <th>Sum</th>
-                                    <th>Image</th>
-                                </tr>
-                                <tr>
-                                    <th></th>
-                                    <th></th>
-                                    <th>
+                                    <th>Item <br>
                                         <div class="dropdown w-100">
                                             <button class="btn w-100 btn-light dropdown-toggle" type="button"
                                                 id="itemDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -127,13 +115,13 @@ if (isset($_POST['submit'])) {
                                             </ul>
                                         </div>
                                     </th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
+                                    <th>Brand</th>
+                                    <th class="text-left">Model</th>
+                                    <th>Year</th>
+                                    <th>Qty</th>
+                                    <th>Price</th>
+                                    <th>Sum</th>
+                                    <th>Image</th>
                                 </tr>
                             </thead>
                             <tbody>

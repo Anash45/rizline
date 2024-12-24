@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 02, 2024 at 01:13 PM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Generation Time: Dec 21, 2024 at 11:44 PM
+-- Server version: 8.0.35
+-- PHP Version: 8.2.0
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,19 +24,82 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `orders`
+--
+
+CREATE TABLE `orders` (
+  `order_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `order_status` int NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `orders`
+--
+
+INSERT INTO `orders` (`order_id`, `user_id`, `order_status`, `created_at`) VALUES
+(5, 1, 2, '2024-12-16 12:46:28'),
+(6, 1, 2, '2024-12-21 13:21:32'),
+(7, 8, 2, '2024-12-21 14:01:34'),
+(8, 8, 2, '2024-12-21 17:26:29'),
+(9, 8, 1, '2024-12-21 17:27:29'),
+(13, 9, 1, '2024-12-21 18:39:57');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_lines`
+--
+
+CREATE TABLE `order_lines` (
+  `ol_id` int NOT NULL,
+  `order_id` int NOT NULL,
+  `item_id` int NOT NULL,
+  `quantity` int NOT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `order_lines`
+--
+
+INSERT INTO `order_lines` (`ol_id`, `order_id`, `item_id`, `quantity`, `price`, `created_at`) VALUES
+(9, 5, 1, 3, '15.00', '2024-12-16 12:46:28'),
+(10, 5, 1001, 23, '15.00', '2024-12-16 12:46:28'),
+(11, 5, 1005, 15, '15.00', '2024-12-16 12:46:28'),
+(12, 6, 1, 3, '15.00', '2024-12-21 13:21:32'),
+(13, 6, 11, 60, '15.00', '2024-12-21 13:21:32'),
+(14, 6, 1000, 5, '15.00', '2024-12-21 13:21:32'),
+(15, 7, 1, 27, '15.00', '2024-12-21 14:01:34'),
+(16, 7, 2, 33, '15.00', '2024-12-21 14:01:34'),
+(17, 7, 4, 2, '15.00', '2024-12-21 14:01:34'),
+(18, 8, 1, 43, '15.00', '2024-12-21 17:26:29'),
+(19, 8, 3, 12, '15.00', '2024-12-21 17:26:29'),
+(20, 9, 1, 43, '15.00', '2024-12-21 17:27:29'),
+(21, 9, 3, 12, '15.00', '2024-12-21 17:27:29'),
+(22, 13, 902, 30, '15.00', '2024-12-21 18:39:57'),
+(23, 13, 1172, 10, '7.00', '2024-12-21 18:39:57'),
+(24, 13, 1175, 20, '7.00', '2024-12-21 18:39:57'),
+(25, 13, 1739, 40, '7.00', '2024-12-21 18:39:57');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `rizline_list`
 --
 
 CREATE TABLE `rizline_list` (
-  `ID` int(11) NOT NULL,
-  `ITEM` varchar(255) NOT NULL,
-  `EAN` varchar(255) NOT NULL,
-  `BRAND` varchar(255) NOT NULL,
-  `MODEL` varchar(255) NOT NULL,
-  `YEAR` varchar(255) NOT NULL,
-  `QTY` varchar(255) NOT NULL,
-  `PRICE` varchar(255) NOT NULL,
-  `IMAGE` varchar(255) NOT NULL
+  `ID` int NOT NULL,
+  `ITEM` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `EAN` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `BRAND` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `MODEL` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `YEAR` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `QTY` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `PRICE` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `IMAGE` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -2030,27 +2093,45 @@ INSERT INTO `rizline_list` (`ID`, `ITEM`, `EAN`, `BRAND`, `MODEL`, `YEAR`, `QTY`
 --
 
 CREATE TABLE `users` (
-  `id` int(3) NOT NULL,
-  `username` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `reg_date` date NOT NULL
+  `id` int NOT NULL,
+  `username` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `user_type` enum('user','admin') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'user',
+  `reg_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `password`, `email`, `reg_date`) VALUES
-(1, 'evolution', '$2y$10$I6.A32iEHyzlcZ4tMHBIw.xEQ1M8zRoojURJLRTFr1XB/EG2zvCpe', 'evo@gmail.com', '0000-00-00'),
-(2, 'asdfs', '$2y$10$F65g8AjxawvOnCt2q7PcrOkDxzHObXHrb/EahEFm5SE21J0pQiDDu', 'asdf@adsf', '0000-00-00'),
-(3, 'dudu', '$2y$10$TC86H/lUyhosrmW9eQCvfe9ZWhU1JqA6OCadfJMfy/6D6qLHgkkJm', 'dudu@dudu', '0000-00-00'),
-(4, 'Paradise Air Fresheners', '$2y$10$0ygfdZk6jtNoX4m1ENxEf.SOkvOvIRVtfQVf2BmAFWt8Zqq/GVk8O', 'paradies@gmail.com', '0000-00-00'),
-(5, 'devaour motors ', '$2y$10$s0SQvk4Axej78fSofbEt3Ou/cVr.iYp7WuKu2iy5ICtr5J4Vh14WS', 'devaour@gmail.com', '0000-00-00');
+INSERT INTO `users` (`id`, `username`, `password`, `email`, `user_type`, `reg_date`) VALUES
+(1, 'evolution', '$2y$10$I6.A32iEHyzlcZ4tMHBIw.xEQ1M8zRoojURJLRTFr1XB/EG2zvCpe', 'evo@gmail.com', 'user', '2024-12-21 17:35:29'),
+(2, 'asdfs', '$2y$10$F65g8AjxawvOnCt2q7PcrOkDxzHObXHrb/EahEFm5SE21J0pQiDDu', 'asdf@adsf', 'user', '2024-12-21 17:35:29'),
+(3, 'dudu', '$2y$10$TC86H/lUyhosrmW9eQCvfe9ZWhU1JqA6OCadfJMfy/6D6qLHgkkJm', 'dudu@dudu', 'user', '2024-12-21 17:35:29'),
+(4, 'Paradise Air Fresheners', '$2y$10$0ygfdZk6jtNoX4m1ENxEf.SOkvOvIRVtfQVf2BmAFWt8Zqq/GVk8O', 'paradies@gmail.com', 'user', '2024-12-21 17:35:29'),
+(5, 'admin', '$2y$10$XKcAVDRcFFmqDddVT2HKd.esRYoniZyHirgfoPuLgUGwinh2sq7sG', 'admin@gmail.com', 'admin', '2024-12-21 17:35:29'),
+(8, 'user123', '$2y$10$XKcAVDRcFFmqDddVT2HKd.esRYoniZyHirgfoPuLgUGwinh2sq7sG', 'abc1@xyz.com', 'user', '2024-12-21 17:45:09'),
+(9, 'test_user', '$2y$10$ko7G37sWoDRDYp3Ktzf1j.EeY2BbrJySFbhu./HP36q6Q6jDczJvu', 'abc2@xyz.com', 'user', '2024-12-21 22:38:23');
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `orders`
+--
+ALTER TABLE `orders`
+  ADD PRIMARY KEY (`order_id`),
+  ADD KEY `fk_orders_user` (`user_id`);
+
+--
+-- Indexes for table `order_lines`
+--
+ALTER TABLE `order_lines`
+  ADD PRIMARY KEY (`ol_id`),
+  ADD KEY `fk_order_lines_order` (`order_id`),
+  ADD KEY `fk_order_lines_item` (`item_id`);
 
 --
 -- Indexes for table `rizline_list`
@@ -2069,16 +2150,45 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT for table `orders`
+--
+ALTER TABLE `orders`
+  MODIFY `order_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- AUTO_INCREMENT for table `order_lines`
+--
+ALTER TABLE `order_lines`
+  MODIFY `ol_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+
+--
 -- AUTO_INCREMENT for table `rizline_list`
 --
 ALTER TABLE `rizline_list`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1975;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1975;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `orders`
+--
+ALTER TABLE `orders`
+  ADD CONSTRAINT `fk_orders_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `order_lines`
+--
+ALTER TABLE `order_lines`
+  ADD CONSTRAINT `fk_order_lines_item` FOREIGN KEY (`item_id`) REFERENCES `rizline_list` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_order_lines_order` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

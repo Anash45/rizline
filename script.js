@@ -1,9 +1,25 @@
 $(document).ready(function () {
+
+
+    let currency = 'usd';
+    let prevCurrency = 'usd';
+
+
+
+
     // Initialize DataTable
     var table = $('#rizline').DataTable({
-        paging: false,
+        paging: true,
         orderCellsTop: true,
-        fixedHeader: true
+        fixedHeader: true,
+        pageLength: 25
+    });
+
+    // Attach event listener for the 'draw' event
+    table.on('draw', function () {
+        console.log('Page changed or table redrawn');
+        // Call your custom function here
+        applyCurrency();
     });
 
     // Handle item filter
@@ -102,6 +118,73 @@ $(document).ready(function () {
     }
 
     calculateTotal();
+
+
+    function applyCurrency(selectedCurrency) {
+        console.log(selectedCurrency, prevCurrency);
+
+        // Set the currency symbol
+        let rateCurrency = 'eur';
+        if (selectedCurrency === 'usd') {
+            rateCurrency = 'eur'
+            $('.price-sign').html('&dollar;');
+        } else if (selectedCurrency === 'eur') {
+            rateCurrency = 'usd'
+            $('.price-sign').html('&euro;');
+        }
+
+        // Get all prices
+        const prices = $('.price-amount');
+
+        if (selectedCurrency !== prevCurrency) {
+            console.log('1');
+            // Fetch conversion rate
+            const apiUrl = `https://v6.exchangerate-api.com/v6/b86433b2ed93e064a73e37c2/latest/${rateCurrency}`;
+            $.get(apiUrl, function (response) {
+                console.log(response);
+                if (response && response.conversion_rates) {
+                    const rate = response.conversion_rates[selectedCurrency.toUpperCase()];
+                    if (rate) {
+                        // Apply conversion
+                        prices.each(function () {
+                            const currentPrice = parseFloat($(this).text());
+                            if (!isNaN(currentPrice)) {
+                                const convertedPrice = (currentPrice * rate).toFixed(2);
+                                $(this).text(convertedPrice); // Update the price
+                            }
+                        });
+                    } else {
+                        console.error('Currency rate not available for', selectedCurrency);
+                    }
+                } else {
+                    console.error('Error fetching conversion rates');
+                }
+            });
+            prevCurrency = selectedCurrency;
+        }
+    }
+    const currencySelect = $('#current_currencyy');
+
+    // Restore the saved currency value on page load
+    const savedCurrency = localStorage.getItem('selectedCurrency');
+    if (savedCurrency) {
+        currencySelect.val(savedCurrency);
+        applyCurrency(savedCurrency);
+        currency = savedCurrency;
+    } else {
+        localStorage.setItem('selectedCurrency', currency);
+        applyCurrency(currency);
+    }
+
+
+
+
+    // Save the selected currency value to localStorage on change
+    currencySelect.on('change', function () {
+        currency = $(this).val();
+        localStorage.setItem('selectedCurrency', currency);
+        applyCurrency(currency);
+    });
 });
 
 // Example starter JavaScript for disabling form submissions if there are invalid fields
@@ -131,5 +214,5 @@ function exportIntoExcel(order_id = 0) {
     let wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
 
     // Export to file
-    XLSX.writeFile(wb, 'order_'+order_id+'_data.xlsx');
+    XLSX.writeFile(wb, 'order_' + order_id + '_data.xlsx');
 }

@@ -13,7 +13,7 @@
             </button>
             <!-- Menu items -->
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
+                <ul class="navbar-nav ml-auto align-items-center">
                     <li class="nav-item px-2 <?php echo $active = ($page == 'items') ? 'active' : ''; ?>">
                         <a class="nav-link" href="./index.php">Home</a>
                     </li>
@@ -21,21 +21,25 @@
                         <a class="nav-link" href="./orders.php">Orders</a>
                     </li>
                     <?php
-                    if(isLoggedIn() && isAdmin()){
+                    if(isLoggedIn() && $page == 'items'){
                         ?>
-                        
+                        <li class="nav-item px-2 d-flex flex-column text-center align-items-center">
+                            <span class="text-success">Total</span>
+                            <a class="nav-link font-weight-bold text-success py-0 d-flex justify-content-center align-items-center gap-1"><span class="price-sign"></span> <span class="order-total price-amount"></span> </a>
+                        </li>
+                        <li class="nav-item px-2">
+                            <button type="submit" class="btn btn-success text-nowrap" name="submit">Confirm Order</button>
+                        </li>
                         <?php
                     }
                     ?>
                     <?php
-                    if(isLoggedIn() && $page == 'items'){
+                    if(isLoggedIn()){
                         ?>
-                        <li class="nav-item px-2">
-                            <a class="nav-link order-total font-weight-bold text-success"></a>
-                        </li>
-                        <li class="nav-item px-2">
-                            <button type="submit" class="btn btn-success" name="submit">Confirm Order</button>
-                        </li>
+                        <select class="form-control" id="current_currencyy">
+                            <option value="usd">USD - &dollar;</option>
+                            <option value="eur">EUR - &euro;</option>
+                        </select>
                         <?php
                     }
                     ?>
