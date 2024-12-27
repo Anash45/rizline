@@ -56,7 +56,7 @@ $info = '';
                     <div class="container">
                         <?php
                         echo $info;
-                        $columns = (!isStaff()) ? 8 : 6;
+                        $columns = (!isStaff()) ? 9 : 6;
                         ?>
                         <div class="table-responsive">
                             <div class="mb-2 text-right">
@@ -77,7 +77,7 @@ $info = '';
                                         <th>Year</th>
                                         <?php
                                         if (!isStaff()) {
-                                            echo '<th>Price</th>';
+                                            echo '<th>Currency</th><th>Price</th>';
                                         }
                                         ?>
                                         <th>Quantity</th>
@@ -142,7 +142,12 @@ $info = '';
                                                 if (!isStaff()) {
                                                     ?>
                                                     <td>
-                                                        <?php echo '<span>' . $price_sign . '</span> <span>' . number_format($row3['price'], 2, '.', ',') . '</span>'; ?>
+                                                        <?php
+                                                            echo '<span>' . $price_sign . '</span>';
+                                                        ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php echo '<span>' . number_format($row3['price'], 2, '.', ',') . '</span>'; ?>
                                                     </td>
                                                     <?php
                                                 }
@@ -154,7 +159,7 @@ $info = '';
                                                 if (!isStaff()) {
                                                     ?>
                                                     <td>
-                                                        <?php echo '<span>' . $price_sign . '</span> <span>' . number_format($itemTotal, 2, '.', ',') . '</span>'; ?>
+                                                        <?php echo '<span>' . number_format($itemTotal, 2, '.', ',') . '</span>'; ?>
                                                     </td>
                                                     <?php
                                                 }
@@ -170,7 +175,7 @@ $info = '';
                                     ?>
                                     <tfoot>
                                         <tr>
-                                            <td colspan="7" class="text-right"><b>Total: </b> </td>
+                                            <td colspan="8" class="text-right"><b>Total: </b> </td>
                                             <td>
                                                 <b><?php echo '<span>' . $price_sign . '</span> <span>' . number_format($total, 2, '.', ',') . '</span>'; ?></b>
                                             </td>

@@ -13,7 +13,7 @@ function isLoggedIn()
 }
 function isUser()
 {
-    return $_SESSION['user_type'] == 'user';
+    return $_SESSION['user_type'] == 'user' || $_SESSION['user_type'] == 'old_user';
 }
 
 function isAdmin()

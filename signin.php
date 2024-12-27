@@ -133,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <input type="password" class="form-control" id="password" name="password" required
                         value="<?php echo isset($_COOKIE['password']) ? $_COOKIE['password'] : ''; ?>">
                 </div>
-                <div class="form-check">
+                <div class="form-check mb-3">
                     <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe" <?php echo isset($_COOKIE['username']) ? 'checked' : ''; ?>>
                     <label class="form-check-label" for="rememberMe">Remember Me</label>
                 </div>

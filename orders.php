@@ -22,11 +22,17 @@ if (isset($_REQUEST['confirm']) && isAdmin()) {
 
 if (isset($_REQUEST['add_dates']) && (isAdmin() || isStaff())) {
     $order_id = $_REQUEST['order_id'];
-    $warehouse_date = date('Y-m-d', strtotime($_REQUEST['warehouse_date']));
-    $production_date = date('Y-m-d', strtotime($_REQUEST['production_date']));
-    $sql4 = "UPDATE orders SET `warehouse_date` = '$warehouse_date', `production_date` = '$production_date' WHERE `order_id` = $order_id";
+    $warehouse_date = (!empty($_REQUEST['warehouse_date'])) ? "'" . date('Y-m-d', strtotime($_REQUEST['warehouse_date'])) . "'" : "NULL";
+    $production_date = (!empty($_REQUEST['production_date'])) ? "'" . date('Y-m-d', strtotime($_REQUEST['production_date'])) . "'" : "NULL";
+
+    $sql4 = "UPDATE orders SET `warehouse_date` = $warehouse_date, `production_date` = $production_date WHERE `order_id` = $order_id";
     $result4 = mysqli_query($conn, $sql4);
+
+    if (!$result4) {
+        die("Error updating record: " . mysqli_error($conn));
+    }
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -59,7 +65,7 @@ if (isset($_REQUEST['add_dates']) && (isAdmin() || isStaff())) {
                             <button class="btn btn-primary" type="button" onclick="exportIntoExcel('main')">Export into
                                 Excel</button>
                         </div>
-                        <table class="table table-bordered main-orders" id="order_details" style="width:100%">
+                        <table class="table table-bordered main-orders" style="width:100%">
                             <thead>
                                 <tr class="text-center">
                                     <th>Order ID</th>
@@ -77,11 +83,7 @@ if (isset($_REQUEST['add_dates']) && (isAdmin() || isStaff())) {
                                     <th>Status</th>
                                     <th>Created At</th>
                                     <th>Action</th>
-                                    <?php
-                                    if (!isUser()) {
-                                        echo '<th>Dates</th>';
-                                    }
-                                    ?>
+                                    <th>Dates</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -163,7 +165,7 @@ if (isset($_REQUEST['add_dates']) && (isAdmin() || isStaff())) {
                                         </td>
                                         <td>
                                             <?php
-                                            echo $row['created_at'];
+                                            echo date('M d Y h:i A', strtotime($row['created_at']));
                                             ?>
                                         </td>
                                         <td>
@@ -200,12 +202,138 @@ if (isset($_REQUEST['add_dates']) && (isAdmin() || isStaff())) {
                                                 </form>
                                             </td>
                                             <?php
+                                        } else if (isUser()) {
+                                            ?>
+                                                <td>
+                                                    <div class="d-flex align-items-end dates-flex text-left date-form justify-content-between w-100">
+                                                    <?php echo ($row['warehouse_date'] != null) ? '
+                                                        <div class="d-flex flex-column">
+                                                            <span class="df-label">Warehouse Date</span>' . date('M d Y', strtotime($row['warehouse_date'])) . '</div>' : ''; ?>
+                                                    <?php echo ($row['warehouse_date'] != null) ? '
+                                                        <div class="d-flex flex-column ml-auto">
+                                                            <span class="df-label">Production Date</span>' . date('M d Y', strtotime($row['warehouse_date'])) . '</div>' : ''; ?>
+                                                    </div>
+                                                </td>
+                                            <?php
                                         }
                                         ?>
                                     </tr>
                                 <?php endwhile; ?>
                             </tbody>
                         </table>
+                        <div class="d-none">
+                            <table class="table table-bordered main-orders" id="order_details" style="width:100%">
+                                <thead>
+                                    <tr class="text-center">
+                                        <th>Order ID</th>
+                                        <?php
+                                        if (isLoggedIn() && (isAdmin() || isStaff())) {
+                                            echo '<th>User</th>';
+                                        }
+                                        ?>
+                                        <th>Items</th>
+                                        <?php
+                                        if (!isStaff()) {
+                                            echo '<th>Currency</th>';
+                                            echo '<th>Total</th>';
+                                        }
+                                        ?>
+                                        <th>Status</th>
+                                        <th>Created At</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $user_id = $_SESSION['user_id'];
+                                    if (isAdmin() || isStaff()) {
+                                        $sql1 = "SELECT * FROM orders ORDER BY order_id DESC";
+                                    } else {
+                                        $sql1 = "SELECT * FROM orders WHERE user_id = '$user_id' ORDER BY order_id DESC";
+                                    }
+
+                                    $result = mysqli_query($conn, $sql1);
+
+                                    ?>
+                                    <?php while ($row = mysqli_fetch_assoc($result)):
+                                        if ($row['order_currency'] == 'eur') {
+                                            $price_sign = '€';
+                                        } else {
+                                            $price_sign = '$';
+                                        }
+                                        ?>
+                                        <tr class="text-center">
+                                            <td class="col-sm-1 align-middle">
+                                                <?php echo $row['order_id']; ?>
+                                            </td>
+                                            <?php
+                                            if (isLoggedIn() && (isAdmin() || isStaff())) {
+                                                echo '
+                                        <td>';
+                                                $user_id = $row['user_id'];
+                                                $sql2 = "SELECT * FROM users WHERE `id` = '$user_id'";
+                                                $result2 = mysqli_query($conn, $sql2);
+                                                $row2 = mysqli_fetch_assoc($result2);
+                                                if (!empty($row2)) {
+                                                    $username = $row2['username'];
+                                                } else {
+                                                    $username = 'NULL';
+                                                }
+                                                echo $username;
+                                            }
+
+                                            echo '
+                                        </td>';
+                                            ?>
+                                            <td>
+                                                <?php
+
+                                                $order_id = $row['order_id'];
+                                                $sql3 = "SELECT * FROM order_lines WHERE `order_id` = '$order_id'";
+                                                $result3 = mysqli_query($conn, $sql3);
+                                                $total = 0;
+                                                $items = 0;
+                                                if (mysqli_num_rows($result3) > 0) {
+                                                    while ($row3 = mysqli_fetch_assoc($result3)) {
+                                                        $itemTotal = $row3['quantity'] * $row3['price'];
+                                                        $total += $itemTotal;
+                                                        $items++;
+                                                    }
+                                                }
+
+                                                echo $items;
+                                                ?>
+                                            </td>
+                                            <?php
+                                            if (!isStaff()) {
+                                                ?>
+                                                <td>
+                                                    <?php
+                                                    echo '<span class="">' . $price_sign . '</span>';
+                                                    ?>
+                                                </td>
+                                                <td>
+                                                    <?php
+                                                    echo '<span class="">' . number_format($total, 2, '.', ',') . '</span>';
+                                                    ?>
+                                                </td>
+                                                <?php
+                                            }
+                                            ?>
+                                            <td>
+                                                <?php
+                                                echo $status = ($row['order_status'] == 1) ? '<span class="font-weight-bold text-success">Confirmed</span>' : '<span class="font-weight-bold text-warning">Pending</span>';
+                                                ?>
+                                            </td>
+                                            <td>
+                                                <?php
+                                                echo date('M d Y h:i A', strtotime($row['created_at']));
+                                                ?>
+                                            </td>
+                                        </tr>
+                                    <?php endwhile; ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </main>

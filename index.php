@@ -2,6 +2,8 @@
 include "db.php";
 if (!isLoggedIn()) {
     header('location:signin.php');
+}elseif (isStaff()) {
+    header('location:orders.php');
 }
 
 $page = "items";
@@ -133,7 +135,7 @@ if (isset($_POST['submit'])) {
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php $result = mysqli_query($conn, "SELECT ID, ITEM, EAN, BRAND, MODEL, YEAR, QTY, PRICE, IMAGE FROM rizline_list"); ?>
+                                <?php $result = mysqli_query($conn, "SELECT ID, ITEM, EAN, BRAND, MODEL, YEAR, QTY, PRICE1, PRICE2, IMAGE FROM rizline_list"); ?>
                                 <?php while ($row = mysqli_fetch_assoc($result)): ?>
                                     <tr class="text-center" id="item_<?php echo $row['ID']; ?>">
                                         <td class="col-sm-1 align-middle">
@@ -149,7 +151,7 @@ if (isset($_POST['submit'])) {
                                         <td class="col-sm-1 align-middle"><input class="form-control input-sm item-qty"
                                                 min="0" type="number"></td>
                                         <td class="col-sm-1 align-middle"><span class="price-sign">&euro;</span> 
-                                            <span class="item-price price-amount eur"><?php echo $row['PRICE']; ?></span>
+                                            <span class="item-price price-amount eur"><?php echo $price_amount = ($_SESSION['user_type'] == 'old_user') ? $row['PRICE1'] : $row['PRICE2'] ; ?></span>
                                         </td>
                                         <td class="col-sm-1 align-middle"><span class="price-sign"></span> <span class="item-sum price-amount">0.00</span></td>
                                         <td class="col-sm-1 align-middle"><a href="<?php echo $row['IMAGE']; ?>"

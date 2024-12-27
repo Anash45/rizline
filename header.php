@@ -23,9 +23,15 @@
                         <?php
                     }
                     ?>
-                    <li class="nav-item px-2 <?php echo $active = ($page == 'items') ? 'active' : ''; ?>">
-                        <a class="nav-link" href="./index.php">Home</a>
-                    </li>
+                    <?php
+                    if (!isStaff()) {
+                        ?>
+                        <li class="nav-item px-2 <?php echo $active = ($page == 'items') ? 'active' : ''; ?>">
+                            <a class="nav-link" href="./index.php">Home</a>
+                        </li>
+                        <?php
+                    }
+                    ?>
                     <li class="nav-item px-2 <?php echo $active = ($page == 'orders') ? 'active' : ''; ?>">
                         <a class="nav-link" href="./orders.php">Orders</a>
                     </li>

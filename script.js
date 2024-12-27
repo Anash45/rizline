@@ -224,13 +224,29 @@ $(document).ready(function () {
 })()
 
 function exportIntoExcel(order_id = 0) {
-    // Create a workbook and sheet
+    // Get the table element
     let table = document.getElementById('order_details');
-    let wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+
+    // Preprocess the table to decode HTML entities
+    let clonedTable = table.cloneNode(true); // Clone the table to avoid modifying the original
+    // let rows = clonedTable.querySelectorAll('tbody tr');
+    // rows.forEach(row => {
+    //     let cells = row.querySelectorAll('td');
+    //     cells.forEach(cell => {
+    //         cell.innerHTML = cell.innerHTML
+    //             .replace(/usd/g, '$') // Replace &dollar; with $
+    //             .replace(/eur/g, '€'); // Replace &euro; with €
+    //             console.log(cell.innerHTML);
+    //     });
+    // });
+
+    // Convert the processed table to a workbook
+    let wb = XLSX.utils.table_to_book(clonedTable, { sheet: "Sheet1" });
 
     // Export to file
     XLSX.writeFile(wb, 'order_' + order_id + '_data.xlsx');
 }
+
 
 $(document).ready(function () {
     // Initialize all date inputs with the 'date-inp' class
