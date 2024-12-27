@@ -13,3 +13,20 @@
 .ss-cont{
     min-height: 100vh;
 }
+
+.table th, .table td{
+    vertical-align: middle;
+}
+
+.dates-flex{
+    width: fit-content;
+    gap: 4px;
+}
+
+.df-label{
+    font-size: 10px;
+}
+
+.main-orders tr>:last-child{
+    width: 360px;
+}

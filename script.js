@@ -1,8 +1,8 @@
 $(document).ready(function () {
 
 
-    let currency = 'usd';
-    let prevCurrency = 'usd';
+    let currency = 'eur';
+    let prevCurrency = 'eur';
 
 
 
@@ -19,7 +19,7 @@ $(document).ready(function () {
     table.on('draw', function () {
         console.log('Page changed or table redrawn');
         // Call your custom function here
-        applyCurrency();
+        applyCurrency(currency);
     });
 
     // Handle item filter
@@ -119,51 +119,60 @@ $(document).ready(function () {
 
     calculateTotal();
 
-
     function applyCurrency(selectedCurrency) {
         console.log(selectedCurrency, prevCurrency);
 
         // Set the currency symbol
-        let rateCurrency = 'eur';
         if (selectedCurrency === 'usd') {
-            rateCurrency = 'eur'
             $('.price-sign').html('&dollar;');
         } else if (selectedCurrency === 'eur') {
-            rateCurrency = 'usd'
             $('.price-sign').html('&euro;');
         }
 
         // Get all prices
         const prices = $('.price-amount');
 
-        if (selectedCurrency !== prevCurrency) {
-            console.log('1');
-            // Fetch conversion rate
-            const apiUrl = `https://v6.exchangerate-api.com/v6/b86433b2ed93e064a73e37c2/latest/${rateCurrency}`;
-            $.get(apiUrl, function (response) {
-                console.log(response);
-                if (response && response.conversion_rates) {
-                    const rate = response.conversion_rates[selectedCurrency.toUpperCase()];
+        if (selectedCurrency) {
+            console.log('Fetching conversion rates...');
+            $.ajax({
+                url: 'currency_converter.php',
+                type: 'GET',
+                data: { base: selectedCurrency === 'usd' ? 'eur' : 'usd' }, // Base currency for conversion
+                dataType: 'json',
+                success: function (rates) {
+                    console.log('Conversion rates:', rates);
+                    const rate = rates[selectedCurrency.toUpperCase()];
                     if (rate) {
                         // Apply conversion
-                        prices.each(function () {
-                            const currentPrice = parseFloat($(this).text());
-                            if (!isNaN(currentPrice)) {
-                                const convertedPrice = (currentPrice * rate).toFixed(2);
-                                $(this).text(convertedPrice); // Update the price
-                            }
-                        });
+                        updatePrices(prices, rate, selectedCurrency);
                     } else {
                         console.error('Currency rate not available for', selectedCurrency);
                     }
-                } else {
-                    console.error('Error fetching conversion rates');
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching conversion rates:', error);
                 }
             });
             prevCurrency = selectedCurrency;
         }
     }
-    const currencySelect = $('#current_currencyy');
+
+    function updatePrices(prices, rate, curr) {
+        prices.each(function () {
+            const currentPrice = parseFloat($(this).text());
+            if (!isNaN(currentPrice) && !$(this).hasClass(curr)) {
+                const convertedPrice = (currentPrice * rate).toFixed(2);
+                $(this).text(convertedPrice); // Update the price
+                $(this).removeClass('usd');
+                $(this).removeClass('eur');
+                $(this).addClass(curr);
+            }
+        });
+    }
+
+
+
+    const currencySelect = $('#current_currency');
 
     // Restore the saved currency value on page load
     const savedCurrency = localStorage.getItem('selectedCurrency');
@@ -185,6 +194,12 @@ $(document).ready(function () {
         localStorage.setItem('selectedCurrency', currency);
         applyCurrency(currency);
     });
+
+    $(document).ready(function () {
+        $('th .dropdown').on('click', function (e) {
+            e.stopPropagation();
+        })
+    })
 });
 
 // Example starter JavaScript for disabling form submissions if there are invalid fields
@@ -216,3 +231,59 @@ function exportIntoExcel(order_id = 0) {
     // Export to file
     XLSX.writeFile(wb, 'order_' + order_id + '_data.xlsx');
 }
+
+$(document).ready(function () {
+    // Initialize all date inputs with the 'date-inp' class
+    $('.date-inp').each(function () {
+        const input = $(this);
+
+        // Get the default value from the input's value attribute
+        const defaultDate = input.val(); // Use .val() to get the value, as .attr('value') might not reflect live changes
+
+        // Initialize the datepicker with the default date
+        input.datepicker({
+            language: 'tr', // Set the language to Turkish
+            format: 'dd MM yyyy', // Proper Turkish format: day month year
+            autoclose: true, // Automatically close the datepicker after selection
+            todayHighlight: true, // Highlight today's date
+            weekStart: 1, // Week starts on Monday
+        });
+
+        // Set the default date if available
+        if (defaultDate) {
+            input.datepicker('setDate', defaultDate);
+        }
+    });
+
+    $('.date-form').submit(function (e) {
+        // Loop through each date input
+        $('.date-inp').each(function () {
+            const input = $(this);
+            const dateValue = input.val();
+
+            if (dateValue) {
+                // Convert from 'dd MM yyyy' format to 'yyyy-mm-dd'
+                const parts = dateValue.split(' '); // Split by space: day, month, year
+                const day = parts[0];
+                const month = getMonthNumber(parts[1]); // Get the numeric month from the Turkish month name
+                const year = parts[2];
+
+                if (day && month && year) {
+                    // Set the new value in 'yyyy-mm-dd' format
+                    const formattedDate = `${year}-${month}-${day}`;
+                    input.val(formattedDate); // Update the input value
+                }
+            }
+        });
+    });
+
+    // Helper function to map Turkish month names to numeric month values
+    function getMonthNumber(monthName) {
+        const months = {
+            'Ocak': '01', 'Şubat': '02', 'Mart': '03', 'Nisan': '04',
+            'Mayıs': '05', 'Haziran': '06', 'Temmuz': '07', 'Ağustos': '08',
+            'Eylül': '09', 'Ekim': '10', 'Kasım': '11', 'Aralık': '12'
+        };
+        return months[monthName] || null;
+    }
+});

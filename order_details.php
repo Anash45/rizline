@@ -5,10 +5,28 @@ if (!isLoggedIn()) {
     header('signin.php');
 }
 if (!isset($_REQUEST['order_id'])) {
-    header('location:order.php');
+    header('location:orders.php');
 }
 
 $order_id = $_GET['order_id'];
+
+$sql5 = "SELECT * FROM orders WHERE order_id = '$order_id'";
+$result5 = mysqli_query($conn, $sql5);
+$row5 = mysqli_fetch_assoc($result5);
+if (!empty($row5)) {
+    $user_id = $row5['user_id'];
+
+
+    if ($row5['user_id'] == $_SESSION['user_id'] || (isAdmin() || isStaff())) {
+
+    } else {
+        header('location:orders.php');
+    }
+
+} else {
+    header('location:orders.php');
+}
+
 $page = 'orders';
 
 $info = '';
@@ -36,7 +54,10 @@ $info = '';
                 ?>
                 <main class="mt-4">
                     <div class="container">
-                        <?php echo $info; ?>
+                        <?php
+                        echo $info;
+                        $columns = (!isStaff()) ? 8 : 6;
+                        ?>
                         <div class="table-responsive">
                             <div class="mb-2 text-right">
                                 <button class="btn btn-primary"
@@ -45,14 +66,26 @@ $info = '';
                             <table class="table table-bordered" id="order_details" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th colspan="4" class="text-center"> Order ID: <?php echo $order_id; ?>
+                                        <th colspan="<?php echo $columns; ?>" class="text-center"> Order ID: <?php echo $order_id; ?>
                                         </th>
                                     </tr>
                                     <tr class="text-center">
                                         <th>Item</th>
-                                        <th>Price</th>
+                                        <th>EAN</th>
+                                        <th>Brand</th>
+                                        <th>Model</th>
+                                        <th>Year</th>
+                                        <?php
+                                        if (!isStaff()) {
+                                            echo '<th>Price</th>';
+                                        }
+                                        ?>
                                         <th>Quantity</th>
-                                        <th>Sum</th>
+                                        <?php
+                                        if (!isStaff()) {
+                                            echo '<th>Sum</th>';
+                                        }
+                                        ?>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -63,6 +96,17 @@ $info = '';
                                     $items = 0;
                                     if (mysqli_num_rows($result3) > 0) {
                                         while ($row3 = mysqli_fetch_assoc($result3)) {
+
+                                            $sql4 = "SELECT * FROM orders WHERE order_id = '$order_id'";
+                                            $result4 = mysqli_query($conn, $sql4);
+                                            $row4 = mysqli_fetch_assoc($result4);
+
+                                            $price_sign = '&dollar;';
+                                            if (!empty($row4)) {
+                                                if ($row4['order_currency'] == 'eur') {
+                                                    $price_sign = '&euro;';
+                                                }
+                                            }
 
                                             $item_id = $row3['item_id'];
                                             $sql2 = "SELECT * FROM rizline_list WHERE `ID` = '$item_id'";
@@ -83,28 +127,58 @@ $info = '';
                                                     <?php echo $item; ?>
                                                 </td>
                                                 <td>
-                                                    <?php echo '$ ' . number_format($row3['price'], 2, '.', ','); ?>
+                                                    <?php echo $row2['EAN']; ?>
                                                 </td>
+                                                <td>
+                                                    <?php echo $row2['BRAND']; ?>
+                                                </td>
+                                                <td>
+                                                    <?php echo $row2['MODEL']; ?>
+                                                </td>
+                                                <td>
+                                                    <?php echo $row2['YEAR']; ?>
+                                                </td>
+                                                <?php
+                                                if (!isStaff()) {
+                                                    ?>
+                                                    <td>
+                                                        <?php echo '<span>' . $price_sign . '</span> <span>' . number_format($row3['price'], 2, '.', ',') . '</span>'; ?>
+                                                    </td>
+                                                    <?php
+                                                }
+                                                ?>
                                                 <td>
                                                     <?php echo $row3['quantity']; ?>
                                                 </td>
-                                                <td>
-                                                    <?php echo '$ ' . number_format($itemTotal, 2, '.', ','); ?>
-                                                </td>
+                                                <?php
+                                                if (!isStaff()) {
+                                                    ?>
+                                                    <td>
+                                                        <?php echo '<span>' . $price_sign . '</span> <span>' . number_format($itemTotal, 2, '.', ',') . '</span>'; ?>
+                                                    </td>
+                                                    <?php
+                                                }
+                                                ?>
                                             </tr>
                                             <?php
                                         }
                                     }
                                     ?>
                                 </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="3" class="text-right"><b>Total: </b> </td>
-                                        <td>
-                                            <b><?php echo '$ ' . number_format($total, 2, '.', ','); ?></b>
-                                        </td>
-                                    </tr>
-                                </tfoot>
+                                <?php
+                                if (!isStaff()) {
+                                    ?>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="7" class="text-right"><b>Total: </b> </td>
+                                            <td>
+                                                <b><?php echo '<span>' . $price_sign . '</span> <span>' . number_format($total, 2, '.', ',') . '</span>'; ?></b>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                    <?php
+                                }
+                                ?>
                             </table>
                         </div>
                     </div>

@@ -9,9 +9,8 @@ $conn = mysqli_connect(hostname: "Localhost", username: "root", password: "root"
 
 function isLoggedIn()
 {
-    return isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0;
+    return !empty($_SESSION['user_id']) && is_numeric($_SESSION['user_id']) && $_SESSION['user_id'] > 0;
 }
-
 function isUser()
 {
     return $_SESSION['user_type'] == 'user';
@@ -20,6 +19,11 @@ function isUser()
 function isAdmin()
 {
     return $_SESSION['user_type'] == 'admin';
+}
+
+function isStaff()
+{
+    return $_SESSION['user_type'] == 'staff';
 }
 
 ?>

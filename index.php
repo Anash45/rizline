@@ -1,29 +1,36 @@
 <?php
 include "db.php";
-
 if (!isLoggedIn()) {
-    header('signin.php');
+    header('location:signin.php');
 }
 
 $page = "items";
 $info = '';
+
 if (isset($_POST['submit'])) {
-    // print_r($_POST);
     // Assign user ID and input data
+    $order_currency = $_POST['order_currency'] ?? 'usd'; // Default to 'usd' if not provided
     $user_id = $_SESSION['user_id'] ?? null;
     $items = $_POST['item_ids'] ?? null; // Array of item IDs
     $quantities = $_POST['quantities'] ?? null; // Array of quantities
     $prices = $_POST['prices'] ?? null; // Array of prices
 
-
     // Validate input
-    if (($items !== null && $quantities !== null && $prices !== null) && is_array($items) && is_array($quantities) && is_array($prices) && count($items) === count($quantities) && count($items) === count($prices)) {
+    if (
+        ($items !== null && $quantities !== null && $prices !== null) &&
+        is_array($items) &&
+        is_array($quantities) &&
+        is_array($prices) &&
+        count($items) === count($quantities) &&
+        count($items) === count($prices)
+    ) {
         // Insert data into orders table
         $order_status = 2; // Example status
         $created_at = date('Y-m-d H:i:s');
 
-        $stmt = $conn->prepare("INSERT INTO orders (user_id, order_status, created_at) VALUES (?, ?, ?)");
-        $stmt->bind_param("iss", $user_id, $order_status, $created_at);
+        // Prepare the SQL statement
+        $stmt = $conn->prepare("INSERT INTO orders (user_id, order_status, order_currency, created_at) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("isss", $user_id, $order_status, $order_currency, $created_at);
 
         if ($stmt->execute()) {
             $order_id = $stmt->insert_id; // Get the last inserted order ID
@@ -61,6 +68,7 @@ if (isset($_POST['submit'])) {
         $info = "<div class='alert alert-danger'>Invalid input data. Please check your items, quantities, and prices.</div>";
     }
 }
+
 
 ?>
 <!DOCTYPE html>
@@ -140,10 +148,10 @@ if (isset($_POST['submit'])) {
                                         <td class="col-sm-1 align-middle"><?php echo $row['YEAR']; ?></td>
                                         <td class="col-sm-1 align-middle"><input class="form-control input-sm item-qty"
                                                 min="0" type="number"></td>
-                                        <td class="col-sm-1 align-middle">
-                                            <span class="item-price"><?php echo $row['PRICE']; ?></span>
+                                        <td class="col-sm-1 align-middle"><span class="price-sign">&euro;</span> 
+                                            <span class="item-price price-amount eur"><?php echo $row['PRICE']; ?></span>
                                         </td>
-                                        <td class="col-sm-1 align-middle"><span class="item-sum">0.00</span></td>
+                                        <td class="col-sm-1 align-middle"><span class="price-sign"></span> <span class="item-sum price-amount">0.00</span></td>
                                         <td class="col-sm-1 align-middle"><a href="<?php echo $row['IMAGE']; ?>"
                                                 target="_blank"><i class="bi bi-image"></i></a></td>
                                     </tr>
