@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 27, 2024 at 11:01 PM
--- Server version: 8.0.39
--- PHP Version: 8.1.25
+-- Generation Time: Dec 28, 2024 at 08:11 PM
+-- Server version: 8.0.35
+-- PHP Version: 8.2.0
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -31,7 +31,7 @@ CREATE TABLE `orders` (
   `order_id` int NOT NULL,
   `user_id` int NOT NULL,
   `order_status` int NOT NULL,
-  `order_currency` varchar(5) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'usd',
+  `order_currency` varchar(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'usd',
   `warehouse_date` date DEFAULT NULL,
   `production_date` date DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -44,7 +44,9 @@ CREATE TABLE `orders` (
 INSERT INTO `orders` (`order_id`, `user_id`, `order_status`, `order_currency`, `warehouse_date`, `production_date`, `created_at`) VALUES
 (1, 11, 2, 'eur', NULL, NULL, '2024-12-27 17:59:01'),
 (2, 9, 2, 'eur', NULL, NULL, '2024-12-27 17:59:37'),
-(3, 9, 2, 'usd', NULL, NULL, '2024-12-27 17:59:58');
+(3, 9, 2, 'usd', NULL, NULL, '2024-12-27 17:59:58'),
+(4, 9, 2, 'usd', NULL, NULL, '2024-12-28 15:07:54'),
+(5, 9, 2, 'usd', NULL, NULL, '2024-12-28 17:09:38');
 
 -- --------------------------------------------------------
 
@@ -66,15 +68,19 @@ CREATE TABLE `order_lines` (
 --
 
 INSERT INTO `order_lines` (`ol_id`, `order_id`, `item_id`, `quantity`, `price`, `created_at`) VALUES
-(1, 1, 1, 2, 15.00, '2024-12-27 17:59:01'),
-(2, 1, 3, 10, 15.00, '2024-12-27 17:59:01'),
-(3, 1, 38, 4, 15.00, '2024-12-27 17:59:01'),
-(4, 2, 1, 12, 16.00, '2024-12-27 17:59:37'),
-(5, 2, 2, 10, 16.00, '2024-12-27 17:59:37'),
-(6, 2, 246, 4, 16.00, '2024-12-27 17:59:37'),
-(7, 3, 1, 5, 16.67, '2024-12-27 17:59:58'),
-(8, 3, 4, 10, 16.67, '2024-12-27 17:59:58'),
-(9, 3, 246, 20, 16.67, '2024-12-27 17:59:58');
+(1, 1, 1, 2, '15.00', '2024-12-27 17:59:01'),
+(2, 1, 3, 10, '15.00', '2024-12-27 17:59:01'),
+(3, 1, 38, 4, '15.00', '2024-12-27 17:59:01'),
+(4, 2, 1, 12, '16.00', '2024-12-27 17:59:37'),
+(5, 2, 2, 10, '16.00', '2024-12-27 17:59:37'),
+(6, 2, 246, 4, '16.00', '2024-12-27 17:59:37'),
+(7, 3, 1, 5, '16.67', '2024-12-27 17:59:58'),
+(8, 3, 4, 10, '16.67', '2024-12-27 17:59:58'),
+(9, 3, 246, 20, '16.67', '2024-12-27 17:59:58'),
+(10, 4, 1, 2, '16.67', '2024-12-28 15:07:54'),
+(11, 4, 3, 6, '16.67', '2024-12-28 15:07:54'),
+(12, 5, 2, 10, '16.67', '2024-12-28 17:09:38'),
+(13, 5, 4, 20, '16.67', '2024-12-28 17:09:38');
 
 -- --------------------------------------------------------
 
@@ -2085,23 +2091,21 @@ CREATE TABLE `users` (
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `user_type` enum('user','old_user','admin','staff') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'user',
-  `reg_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `reg_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `status` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `password`, `email`, `user_type`, `reg_date`) VALUES
-(1, 'evolution', '$2y$10$I6.A32iEHyzlcZ4tMHBIw.xEQ1M8zRoojURJLRTFr1XB/EG2zvCpe', 'evo@gmail.com', 'user', '2024-12-21 17:35:29'),
-(2, 'asdfs', '$2y$10$F65g8AjxawvOnCt2q7PcrOkDxzHObXHrb/EahEFm5SE21J0pQiDDu', 'asdf@adsf', 'user', '2024-12-21 17:35:29'),
-(3, 'dudu', '$2y$10$TC86H/lUyhosrmW9eQCvfe9ZWhU1JqA6OCadfJMfy/6D6qLHgkkJm', 'dudu@dudu', 'user', '2024-12-21 17:35:29'),
-(4, 'Paradise Air Fresheners', '$2y$10$0ygfdZk6jtNoX4m1ENxEf.SOkvOvIRVtfQVf2BmAFWt8Zqq/GVk8O', 'paradies@gmail.com', 'user', '2024-12-21 17:35:29'),
-(5, 'admin', '$2y$10$XKcAVDRcFFmqDddVT2HKd.esRYoniZyHirgfoPuLgUGwinh2sq7sG', 'admin@gmail.com', 'admin', '2024-12-21 17:35:29'),
-(8, 'user123', '$2y$10$XKcAVDRcFFmqDddVT2HKd.esRYoniZyHirgfoPuLgUGwinh2sq7sG', 'abc1@xyz.com', 'user', '2024-12-21 17:45:09'),
-(9, 'test_user', '$2y$10$ko7G37sWoDRDYp3Ktzf1j.EeY2BbrJySFbhu./HP36q6Q6jDczJvu', 'abc2@xyz.com', 'user', '2024-12-21 22:38:23'),
-(10, 'staff1', '$2y$10$xHCr.X2/3/X3TyCCvF.5POFT58rNN0NnxyLaZ7bjeh9voCoFWL7ya', 'staff1@gmail.com', 'staff', '2024-12-24 23:53:41'),
-(11, 'old_user', '$2y$10$zov.pnYSkaaUdOxSzAjpq.hytzMRW4Y0mhDaIfYI.4JGfQ9QdwTGu', 'old_user@gmail.com', 'old_user', '2024-12-27 21:31:09');
+INSERT INTO `users` (`id`, `username`, `password`, `email`, `user_type`, `reg_date`, `status`) VALUES
+(5, 'admin', '$2y$10$XKcAVDRcFFmqDddVT2HKd.esRYoniZyHirgfoPuLgUGwinh2sq7sG', 'admin@gmail.com', 'admin', '2024-12-21 17:35:29', 1),
+(8, 'user123', '$2y$10$xHCr.X2/3/X3TyCCvF.5POFT58rNN0NnxyLaZ7bjeh9...', 'abc1@xyz.com', 'user', '2024-12-21 17:45:09', 1),
+(9, 'test_user', '$2y$10$ko7G37sWoDRDYp3Ktzf1j.EeY2BbrJySFbhu./HP36q6Q6jDczJvu', 'abc2@xyz.com', 'user', '2024-12-21 22:38:23', 1),
+(10, 'staff1', '$2y$10$xHCr.X2/3/X3TyCCvF.5POFT58rNN0NnxyLaZ7bjeh9voCoFWL7ya', 'staff1@gmail.com', 'staff', '2024-12-24 23:53:41', 1),
+(11, 'old_user', '$2y$10$zov.pnYSkaaUdOxSzAjpq.hytzMRW4Y0mhDaIfYI.4JGfQ9QdwTGu', 'old_user@gmail.com', 'old_user', '2024-12-27 21:31:09', 1),
+(12, 'user2', '$2y$10$qb9Po7QDZ7Yv1Kh0FCsXWuiyryhBHsgCT3Rs9Z11VvjUOAWLjTqZa', 'user1234@gmail.com', 'user', '2024-12-28 18:56:02', 0);
 
 --
 -- Indexes for dumped tables
@@ -2142,13 +2146,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `order_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `order_lines`
 --
 ALTER TABLE `order_lines`
-  MODIFY `ol_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `ol_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `rizline_list`
@@ -2160,7 +2164,7 @@ ALTER TABLE `rizline_list`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Constraints for dumped tables

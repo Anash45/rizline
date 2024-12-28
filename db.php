@@ -1,5 +1,6 @@
 <?php
 session_start();
+date_default_timezone_set("Europe/Istanbul");
 
 $conn = mysqli_connect(hostname: "Localhost", username: "root", password: "root", database: "rizline");
 

@@ -32,6 +32,15 @@
                         <?php
                     }
                     ?>
+                    <?php
+                    if (isAdmin()) {
+                        ?>
+                        <li class="nav-item px-2 <?php echo $active = ($page == 'users') ? 'active' : ''; ?>">
+                            <a class="nav-link" href="./users.php">Users</a>
+                        </li>
+                        <?php
+                    }
+                    ?>
                     <li class="nav-item px-2 <?php echo $active = ($page == 'orders') ? 'active' : ''; ?>">
                         <a class="nav-link" href="./orders.php">Orders</a>
                     </li>

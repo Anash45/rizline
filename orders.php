@@ -2,7 +2,7 @@
 include "db.php";
 
 if (!isLoggedIn()) {
-    header('signin.php');
+    header('location:signin.php');
 }
 
 $page = 'orders';
@@ -165,7 +165,7 @@ if (isset($_REQUEST['add_dates']) && (isAdmin() || isStaff())) {
                                         </td>
                                         <td>
                                             <?php
-                                            echo date('M d Y h:i A', strtotime($row['created_at']));
+                                            echo date('d.m.Y h:i A', strtotime($row['created_at']));
                                             ?>
                                         </td>
                                         <td>
@@ -208,10 +208,10 @@ if (isset($_REQUEST['add_dates']) && (isAdmin() || isStaff())) {
                                                     <div class="d-flex align-items-end dates-flex text-left date-form justify-content-between w-100">
                                                     <?php echo ($row['warehouse_date'] != null) ? '
                                                         <div class="d-flex flex-column">
-                                                            <span class="df-label">Warehouse Date</span>' . date('M d Y', strtotime($row['warehouse_date'])) . '</div>' : ''; ?>
+                                                            <span class="df-label">Warehouse Date</span>' . date('d.m.Y', strtotime($row['warehouse_date'])) . '</div>' : ''; ?>
                                                     <?php echo ($row['warehouse_date'] != null) ? '
                                                         <div class="d-flex flex-column ml-auto">
-                                                            <span class="df-label">Production Date</span>' . date('M d Y', strtotime($row['warehouse_date'])) . '</div>' : ''; ?>
+                                                            <span class="df-label">Production Date</span>' . date('d.m.Y', strtotime($row['warehouse_date'])) . '</div>' : ''; ?>
                                                     </div>
                                                 </td>
                                             <?php

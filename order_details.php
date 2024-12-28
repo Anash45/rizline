@@ -2,7 +2,7 @@
 include "db.php";
 
 if (!isLoggedIn()) {
-    header('signin.php');
+    header('location:signin.php');
 }
 if (!isset($_REQUEST['order_id'])) {
     header('location:orders.php');
